@@ -13,7 +13,7 @@ const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 const Home: NextPage = () => {
 	const { register, handleSubmit, watch, formState: { errors } } = useForm();
-	const [request, setRequest] = useState(false)
+	const [request, setRequest] = useState({status: "", statusText: "", responseTimeInMs: "", body: {}, headers: {}})
 	const [expandBody, setExpandBody] = useState(true)
 	const [expandHeaders, setExpandHeaders] = useState(false)
 
@@ -79,7 +79,7 @@ const Home: NextPage = () => {
 				  <input type="submit" />
 			  </Form>
 		  </form>
-		  {request &&<section>
+		  {request.status &&<section>
 			  <p>status : {request.status}</p>
 			  <p>status text : {request.statusText}</p>
 			  <p>response time: {request.responseTimeInMs}ms</p>
