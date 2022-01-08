@@ -15,6 +15,7 @@ const Home: NextPage = () => {
 	const { register, handleSubmit, watch, formState: { errors } } = useForm();
 	const [request, setRequest] = useState({status: "", statusText: "", responseTimeInMs: "", body: {}, headers: {}})
 	const [expandBody, setExpandBody] = useState(true)
+	const [expandRequestBody, setExpandRequestBody] = useState(false)
 	const [expandHeaders, setExpandHeaders] = useState(false)
 
 
@@ -27,6 +28,11 @@ const Home: NextPage = () => {
 			const set = !expandHeaders
 			setExpandHeaders(set)
 		}
+		if(type === "requestBoxy"){
+			const set = !expandRequestBody
+			setExpandRequestBody(set)
+		}
+
 	}
 
 
@@ -75,7 +81,9 @@ const Home: NextPage = () => {
 					  </RequestTypeSelect>
 					  {errors.requestType && <span>This field is required</span>}
 				  </div>
-				  <Payload placeholder="remember to wrap in {}" {...register("body")}/>
+				  <Button onClick={() => handleExpand("requestBoxy")}>Click to input request body</Button>
+				  {expandRequestBody && <Payload placeholder="remember to wrap in {}" {...register("body")}/>}
+
 				  <input type="submit" />
 			  </Form>
 		  </form>
@@ -138,7 +146,7 @@ const RequestTypeSelect = styled.select`
   margin-left: 10px;
   height: 40px;
   border: 0;
-  background-color: bisque;
+  background-color: #A8CDD0FF;
 `
 const Payload = styled.textarea`
   margin: 0;
@@ -147,4 +155,12 @@ const Payload = styled.textarea`
   height: 500px;
   resize: none;
 `
+const Button = styled.div`
+  border: 1px solid black;
+  width: 200px;
+  cursor: pointer;
 
+  :hover {
+	background-color: #a8cdd0;
+  }
+`
