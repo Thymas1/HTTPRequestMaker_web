@@ -59,7 +59,6 @@ const Home: NextPage = () => {
 		console.log("THIS IS NOT")
 	}
 
-	console.log("request", request)
   // @ts-ignore
 	// @ts-ignore
 	return (
