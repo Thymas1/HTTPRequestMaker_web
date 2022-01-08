@@ -1,10 +1,60 @@
 import type { NextPage } from 'next'
+import dynamic from 'next/dynamic'
+import {useState} from "react";
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import axios from "axios"
+import React from "react";
+import { useForm } from "react-hook-form";
+// @ts-ignore
+import styled from "styled-components"
+const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 const Home: NextPage = () => {
-  return (
+	const { register, handleSubmit, watch, formState: { errors } } = useForm();
+	const [request, setRequest] = useState({})
+	const [expandBody, setExpandBody] = useState(true)
+	const [expandHeaders, setExpandHeaders] = useState(false)
+
+
+	const handleExpand = (type: string) => {
+		if(type === "body"){
+			const set = !expandBody
+			setExpandBody(set)
+		}
+		if(type === "headers"){
+			const set = !expandHeaders
+			setExpandHeaders(set)
+		}
+	}
+
+
+
+
+	const onSubmit = async (data: any) => {
+		if(data.requestType === "get"){
+			const url = `http://localhost:3000/request/getMethod?url=${data.url}`
+			console.log(url);
+			console.log("THIS IS A GET REQUEST")
+			const request = await axios.get(url)
+			setRequest(request.data)
+		}
+		if(data.requestType === "post"){
+			const url = `http://localhost:3000/request/postMethod?url=${data.url}`
+			console.log(url);
+			const body = JSON.parse(data.body)
+			console.log("body", body)
+			console.log("THIS IS A POST REQUEST")
+			const request = await axios.post(url, body)
+			setRequest(request.data)
+		}
+		console.log("THIS IS NOT")
+	}
+
+	console.log("request", request)
+  // @ts-ignore
+	return (
     <div className={styles.container}>
       <Head>
         <title>Create Next App</title>
@@ -13,60 +63,86 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+		  <form onSubmit={handleSubmit(onSubmit)}>
+			  <Form>
+				  <div>
+					  <UrlInput placeholder="url for request" {...register("url")} />
+					  <RequestTypeSelect placeholder="requestMethod" {...register("requestType", { required: true })} >
+						  <option value="get">GET</option>
+						  <option value="post">POST</option>
+					  </RequestTypeSelect>
+					  {errors.requestType && <span>This field is required</span>}
+				  </div>
+				  <Payload placeholder="remember to wrap in {}" {...register("body")}/>
+				  <input type="submit" />
+			  </Form>
+		  </form>
+		  {request.body &&<section>
+			  <p>status : {request.status}</p>
+			  <p>status text : {request.statusText}</p>
+			  <p>response time: {request.responseTimeInMs}ms</p>
+			  <p onClick={() => handleExpand("body")}>Data:</p>
+			  {expandBody &&
+				  <DisplayJson>
+					  <div>
+							{typeof window !== 'undefined' && request.body && <DynamicReactJson src={request.body}/>}
+					  </div>
+				  </DisplayJson>
+			  }
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+			  <p onClick={() => handleExpand("headers")}>Headers:</p>
+				  {expandHeaders &&
+			  		<DisplayJson>
+							  <div>
+								  {typeof window !== 'undefined' && request.headers && <DynamicReactJson src={request.headers}/>}
+							  </div>
+			  		</DisplayJson>
+				  }
+		  </section>}
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <Footer className={styles.footer}>
+		  <p>Project created by Thomas Johan Endresen </p>
+		  <p>For all of us who belive postman can be better and simpler</p>
+      </Footer>
     </div>
   )
 }
 
+	// http://api.dev-3.spense.staccx.dev/api/i18n
+	// http://httpbin.org/post
+
 export default Home
+
+
+const DisplayJson = styled.div`
+height: 500px;
+  width:  100%;
+  overflow: scroll;
+`
+const Footer = styled.footer`
+display: flex;
+  flex-direction: column;
+`
+const Form = styled.div`
+display: flex;
+  flex-direction: column;
+`
+const UrlInput = styled.input`
+width: 300px;
+  height: 40px;
+`
+
+const RequestTypeSelect = styled.select`
+  margin-left: 10px;
+  height: 40px;
+  border: 0;
+  background-color: bisque;
+`
+const Payload = styled.textarea`
+  margin: 0;
+  border-radius: 0;
+  width: 500px;
+  height: 500px;
+  resize: none;
+`
+
