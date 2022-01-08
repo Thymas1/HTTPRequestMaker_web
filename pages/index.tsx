@@ -13,7 +13,7 @@ const DynamicReactJson = dynamic(import('react-json-view'), { ssr: false });
 
 const Home: NextPage = () => {
 	const { register, handleSubmit, watch, formState: { errors } } = useForm();
-	const [request, setRequest] = useState({})
+	const [request, setRequest] = useState(false)
 	const [expandBody, setExpandBody] = useState(true)
 	const [expandHeaders, setExpandHeaders] = useState(false)
 
@@ -33,7 +33,7 @@ const Home: NextPage = () => {
 
 
 	const onSubmit = async (data: any) => {
-		const baseUrl = "https://httpr-equest-maker-back-ar1hw0e3h-thomasjohanendresen.vercel.app/"
+		const baseUrl = "https://httpr-equest-maker-back-ar1hw0e3h-thomasjohanendresen.vercel.app/request"
 		if(data.requestType === "get"){
 			const url = `${baseUrl}/getMethod?url=${data.url}`
 			console.log(url);
@@ -55,6 +55,7 @@ const Home: NextPage = () => {
 
 	console.log("request", request)
   // @ts-ignore
+	// @ts-ignore
 	return (
     <div className={styles.container}>
       <Head>
@@ -78,7 +79,7 @@ const Home: NextPage = () => {
 				  <input type="submit" />
 			  </Form>
 		  </form>
-		  {request.body &&<section>
+		  {request &&<section>
 			  <p>status : {request.status}</p>
 			  <p>status text : {request.statusText}</p>
 			  <p>response time: {request.responseTimeInMs}ms</p>
