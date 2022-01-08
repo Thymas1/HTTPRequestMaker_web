@@ -33,15 +33,16 @@ const Home: NextPage = () => {
 
 
 	const onSubmit = async (data: any) => {
+		const baseUrl = "https://httpr-equest-maker-back-ar1hw0e3h-thomasjohanendresen.vercel.app/"
 		if(data.requestType === "get"){
-			const url = `http://localhost:3000/request/getMethod?url=${data.url}`
+			const url = `${baseUrl}/getMethod?url=${data.url}`
 			console.log(url);
 			console.log("THIS IS A GET REQUEST")
 			const request = await axios.get(url)
 			setRequest(request.data)
 		}
 		if(data.requestType === "post"){
-			const url = `http://localhost:3000/request/postMethod?url=${data.url}`
+			const url = `${baseUrl}/postMethod?url=${data.url}`
 			console.log(url);
 			const body = JSON.parse(data.body)
 			console.log("body", body)
