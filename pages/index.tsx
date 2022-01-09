@@ -110,8 +110,7 @@ const Home: NextPage = () => {
 		  </section>}
       </main>
       <Footer className={styles.footer}>
-		  <p>Project created by Thomas Johan Endresen </p>
-		  <p>For all of us who belive postman can be better and simpler</p>
+
       </Footer>
     </div>
   )
